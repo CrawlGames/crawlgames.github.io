@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Merch Tracker | Latest Bestselling T-Shirts</title>
+    <!-- Clean, modern font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            padding: 20px;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stats span {
+            font-weight: 700;
+            color: #e53e3e;
+            font-size: 1.2rem;
+        }
+
+        /* Filters Panel */
+        .filters-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+
+        .filter-group select, 
+        .filter-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .filter-group select:focus, 
+        .filter-group input:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49,130,206,0.1);
+        }
+
+        .bsr-range {
+            display: flex;
+            gap: 10px;
+        }
+
+        .bsr-range input {
+            width: 50%;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #edf2f7;
+            color: #4a5568;
+        }
+
+        .btn-primary {
+            background: #3182ce;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2b6cb0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .product-info {
+            padding: 16px;
+        }
+
+        .product-bsr {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .product-date {
+            color: #718096;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .product-link {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #ebf8ff;
+            color: #3182ce;
+            text-align: center;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .product-link:hover {
+            background: #bee3f8;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            color: #a0aec0;
+            font-size: 1.2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #a0aec0;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎯 Latest Bestselling Amazon T-Shirts</h1>
+            <div class="stats">
+                <span id="product-count">0</span> products displayed
+            </div>
+        </div>
+
+        <!-- Filters Panel -->
+        <div class="filters-panel">
+            <div class="filter-row">
+                <!-- Sort Filter -->
+                <div class="filter-group">
+                    <label>📊 Sort by</label>
+                    <select id="sort-select">
+                        <option value="date-desc">Newest First ⬇️</option>
+                        <option value="date-asc">Oldest First ⬆️</option>
+                        <option value="bsr-asc">BSR Best (Lowest) ⬆️</option>
+                        <option value="bsr-desc">BSR Worst (Highest) ⬇️</option>
+                    </select>
+                </div>
+
+                <!-- BSR Range Filter -->
+                <div class="filter-group">
+                    <label>🔍 Filter by BSR Range</label>
+                    <div class="bsr-range">
+                        <input type="number" id="bsr-min" placeholder="Min" min="0" step="1000">
+                        <input type="number" id="bsr-max" placeholder="Max" min="0" step="1000">
+                    </div>
+                </div>
+
+                <!-- Date Filter -->
+                <div class="filter-group">
+                    <label>📅 Filter by Date Added</label>
+                    <select id="date-filter">
+                        <option value="all">All Products</option>
+                        <option value="today">Today</option>
+                        <option value="week">Last 7 Days</option>
+                        <option value="month">Last 30 Days</option>
+                    </select>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="filter-group" style="flex: 0.5;">
+                    <label>&nbsp;</label>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                        <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="products-container">
+            <div class="loading">Loading products...</div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🔄 Data updates automatically from Google Sheets | Last updated: <span id="last-update">just now</span></p>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // IMPORTANT: Replace this URL with your correct CSV URL
+        // ============================================
+        const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTAelnJ-cGn1yOofvOvO9WkjocXlyoF-OPya9tJwjceMsjslyWGoh-90yddQgEojlPYorOW-5q6SVys/pub?output=csv';
+        
+        let allProducts = [];
+        let filteredProducts = [];
+
+        // ============================================
+        // Fetch data from Google Sheets
+        // ============================================
+        async function fetchProducts() {
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                const csvText = await response.text();
+                
+                const rows = csvText.split('\n').filter(row => row.trim() !== '');
+                const dataRows = rows.slice(1); // Skip header row "asin,link,bsr..."
+                
+                allProducts = dataRows.map((row, index) => {
+                    const columns = parseCSVRow(row);
+                    
+                    // Column order based on your file: asin, link, bsr, imageUrl, dateAdded
+                    const asin = columns[0] || '';
+                    const productUrl = columns[1] || '#';
+                    const bsrRaw = columns[2] || '';
+                    const imageUrl = columns[3] || 'https://via.placeholder.com/300x300?text=No+Image';
+                    const publishDate = columns[4] || '';
+
+                    // --- Process BSR value ---
+                    let bsrValue = 9999999; // Default high value for products without BSR
+                    if (bsrRaw) {
+                        // Extract numbers only from text (e.g., "#936,278" becomes 936278)
+                        const numberMatch = bsrRaw.replace(/,/g, '').match(/\d+/);
+                        if (numberMatch) {
+                            bsrValue = parseInt(numberMatch[0], 10);
+                        }
+                    }
+
+                    // --- Process date ---
+                    let rawDate = parseDate(publishDate);
+
+                    return {
+                        id: index,
+                        asin: asin,
+                        productUrl: productUrl,
+                        bsr: bsrValue,
+                        bsrDisplay: bsrRaw || 'N/A', // Original text for display
+                        imageUrl: imageUrl,
+                        publishDate: publishDate,
+                        rawDate: rawDate
+                    };
+                }).filter(product => product.productUrl !== '#' && !isNaN(product.bsr)); // Ensure valid URL and BSR
+                
+                applyFilters();
+                document.getElementById('last-update').textContent = new Date().toLocaleString('en-US');
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('products-container').innerHTML = `
+                    <div class="no-results">
+                        <p>😕 Error loading data</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Please ensure the Google Sheets link is correct and published as CSV</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Helper function to parse CSV row correctly (handles quoted fields)
+        function parseCSVRow(row) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        // Helper function to parse date string to Date object
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            // Clean up leading ":" and extra spaces
+            const cleanDateStr = dateStr.replace(/^:\s*/, '').trim();
+            const date = new Date(cleanDateStr);
+            return isNaN(date.getTime()) ? null : date;
+        }
+
+        // ============================================
+        // Apply filters and sorting
+        // ============================================
+        function applyFilters() {
+            const sortBy = document.getElementById('sort-select').value;
+            const bsrMin = parseFloat(document.getElementById('bsr-min').value) || 0;
+            const bsrMax = parseFloat(document.getElementById('bsr-max').value) || Infinity;
+            const dateFilter = document.getElementById('date-filter').value;
+            
+            filteredProducts = allProducts.filter(product => {
+                // BSR filter (using correct numeric value)
+                if (product.bsr < bsrMin || product.bsr > bsrMax) {
+                    return false;
+                }
+                
+                // Date filter
+                if (dateFilter !== 'all' && product.rawDate) {
+                    const now = new Date();
+                    const productDate = product.rawDate;
+                    const diffTime = now - productDate;
+                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                    
+                    if (dateFilter === 'today' && diffDays > 1) return false;
+                    if (dateFilter === 'week' && diffDays > 7) return false;
+                    if (dateFilter === 'month' && diffDays > 30) return false;
+                }
+                
+                return true;
+            });
+            
+            sortProducts(sortBy);
+            renderProducts();
+        }
+
+        function sortProducts(sortBy) {
+            filteredProducts.sort((a, b) => {
+                switch(sortBy) {
+                    case 'date-desc': return (b.rawDate || 0) - (a.rawDate || 0);
+                    case 'date-asc': return (a.rawDate || 0) - (b.rawDate || 0);
+                    case 'bsr-asc': return a.bsr - b.bsr;
+                    case 'bsr-desc': return b.bsr - a.bsr;
+                    default: return 0;
+                }
+            });
+        }
+
+        // ============================================
+        // Render products to the page
+        // ============================================
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            const countSpan = document.getElementById('product-count');
+            
+            countSpan.textContent = filteredProducts.length;
+            
+            if (filteredProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <p>🔍 No products match your search criteria</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Try adjusting the BSR range or date filter</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="products-grid">';
+            
+            filteredProducts.forEach(product => {
+                const formattedDate = product.publishDate.replace(/^:\s*/, '') || 'Unknown';
+                
+                html += `
+                    <div class="product-card" onclick="window.open('${product.productUrl}', '_blank')">
+                        <img class="product-image" 
+                             src="${product.imageUrl}" 
+                             alt="Product" 
+                             onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                        <div class="product-info">
+                            <span class="product-bsr">📊 ${product.bsrDisplay}</span>
+                            <div class="product-date">
+                                <span>📅</span>
+                                <span>${formattedDate}</span>
+                            </div>
+                            <a href="${product.productUrl}" 
+                               target="_blank" 
+                               class="product-link"
+                               onclick="event.stopPropagation()">
+                                🛒 View on Amazon
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function resetFilters() {
+            document.getElementById('sort-select').value = 'date-desc';
+            document.getElementById('bsr-min').value = '';
+            document.getElementById('bsr-max').value = '';
+            document.getElementById('date-filter').value = 'all';
+            applyFilters();
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProducts();
+            document.getElementById('bsr-min').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilters(); });
+            document.getElementById('bsr-max').addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilters(); });
+        });
+
+        window.applyFilters = applyFilters;
+        window.resetFilters = resetFilters;
+    </script>
+</body>
+</html>
